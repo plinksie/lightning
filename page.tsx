@@ -1,11 +1,10 @@
-'use client'
-
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import Controls from '../components/Controls'
-import MoonPhase from '../components/MoonPhase'
+import { ControlsProps } from '../components/Controls'
+import { MoonPhaseProps } from '../components/MoonPhase'
+import { MapProps } from '../components/Map'
 
-const Map = dynamic(() => import('../components/Map'), { ssr: false })
+const DynamicMap = dynamic(() => import('../components/Map'), { ssr: false })
 
 interface LocationData {
   name: string
@@ -31,7 +30,7 @@ export default function Home() {
           Electrical Storms Live - Earth
         </h1>
         <div className="h-[calc(100vh-4rem)] relative">
-          <Map
+          <DynamicMap
             isDarkMode={darkMode}
             showLightning={showLightning}
             showAurora={showAurora}

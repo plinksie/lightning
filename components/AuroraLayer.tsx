@@ -8,7 +8,7 @@ export default function AuroraLayer() {
   const [auroraData, setAuroraData] = useState<Array<{ lat: number; lon: number; intensity: number }>>([])
 
   useEffect(() => {
-    fetchAuroraData().then(setAuroraData)
+    fetchAuroraData().then((data) => setAuroraData(data))
   }, [])
 
   useEffect(() => {

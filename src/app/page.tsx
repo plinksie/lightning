@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import Controls from '../components/Controls'
-import MoonPhase from '../components/MoonPhase'
+import MoonPhase from '../components/MoonPhase.tsx'
 
 const Map = dynamic(() => import('../components/Map'), { ssr: false })
 
