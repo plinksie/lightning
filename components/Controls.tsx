@@ -1,133 +1,16 @@
-// import { useState } from 'react'
-// import * as ToggleGroup from '@radix-ui/react-toggle-group'
-// import * as Switch from '@radix-ui/react-switch'
-
-// interface ControlsProps {
-//   darkMode: boolean
-//   setDarkMode: (value: boolean) => void
-//   showLightning: boolean
-//   setShowLightning: (value: boolean) => void
-//   showAurora: boolean
-//   setShowAurora: (value: boolean) => void
-//   mapType: string
-//   setMapType: (value: string) => void
-//   setSelectedLocation: (value: string) => void
-// }
-
-// export default function Controls({
-//   darkMode,
-//   setDarkMode,
-//   showLightning,
-//   setShowLightning,
-//   showAurora,
-//   setShowAurora,
-//   mapType,
-//   setMapType,
-//   setSelectedLocation,
-// }: ControlsProps) {
-//   const [location, setLocation] = useState('')
-
-//   const handleLocationSubmit = (e: React.FormEvent) => {
-//     e.preventDefault()
-//     setSelectedLocation(location)
-//     setLocation('')
-//   }
-
-//   return (
-//     <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
-//       <div className="flex flex-col space-y-4">
-//         <div className="flex items-center justify-between">
-//           <label htmlFor="dark-mode" className="text-sm font-medium">
-//             Dark Mode
-//           </label>
-//           <Switch.Root
-//             id="dark-mode"
-//             checked={darkMode}
-//             onCheckedChange={setDarkMode}
-//             className="w-11 h-6 bg-gray-200 rounded-full relative dark:bg-gray-700 transition-colors duration-300"
-//           >
-//             <Switch.Thumb className="block w-5 h-5 bg-white rounded-full shadow-lg transform transition-transform duration-300 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[22px]" />
-//           </Switch.Root>
-//         </div>
-//         <ToggleGroup.Root
-//           type="multiple"
-//           className="flex space-x-2"
-//           value={[showLightning ? 'lightning' : '', showAurora ? 'aurora' : '']}
-//           onValueChange={(value) => {
-//             setShowLightning(value.includes('lightning'))
-//             setShowAurora(value.includes('aurora'))
-//           }}
-//         >
-//           <ToggleGroup.Item
-//             value="lightning"
-//             className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm font-medium"
-//           >
-//             Lightning
-//           </ToggleGroup.Item>
-//           <ToggleGroup.Item
-//             value="aurora"
-//             className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm font-medium"
-//           >
-//             Aurora
-//           </ToggleGroup.Item>
-//         </ToggleGroup.Root>
-//         <ToggleGroup.Root
-//           type="single"
-//           value={mapType}
-//           onValueChange={(value) => value && setMapType(value)}
-//           className="flex space-x-2"
-//         >
-//           <ToggleGroup.Item
-//             value="standard"
-//             className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm font-medium"
-//           >
-//             Standard
-//           </ToggleGroup.Item>
-//           <ToggleGroup.Item
-//             value="satellite"
-//             className="px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm font-medium"
-//           >
-//             Satellite
-//           </ToggleGroup.Item>
-//         </ToggleGroup.Root>
-//         <form onSubmit={handleLocationSubmit} className="flex space-x-2">
-//           <input
-//             type="text"
-//             value={location}
-//             onChange={(e) => setLocation(e.target.value)}
-//             placeholder="Enter location"
-//             className="flex-grow px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-md text-sm"
-//           />
-//           <button
-//             type="submit"
-//             className="px-3 py-2 bg-blue-500 text-white rounded-md text-sm font-medium"
-//           >
-//             Go
-//           </button>
-//         </form>
-//       </div>
-//     </div>
-//   )
-// }
-
-import { Dispatch, SetStateAction } from 'react'
-
-interface LocationData {
-  name: string
-  lat: number
-  lon: number
-}
+import { useState } from 'react'
+import { searchCity } from '../lib/api'
 
 interface ControlsProps {
   darkMode: boolean
-  setDarkMode: Dispatch<SetStateAction<boolean>>
+  setDarkMode: (darkMode: boolean) => void
   showLightning: boolean
-  setShowLightning: Dispatch<SetStateAction<boolean>>
+  setShowLightning: (showLightning: boolean) => void
   showAurora: boolean
-  setShowAurora: Dispatch<SetStateAction<boolean>>
+  setShowAurora: (showAurora: boolean) => void
   mapType: string
-  setMapType: Dispatch<SetStateAction<string>>
-  onLocationSelect: (location: LocationData) => void
+  setMapType: (mapType: string) => void
+  onLocationSelect: (location: { name: string; lat: number; lon: number }) => void
 }
 
 export default function Controls({
@@ -141,10 +24,70 @@ export default function Controls({
   setMapType,
   onLocationSelect
 }: ControlsProps) {
-  // Control component implementation
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const result = await searchCity(searchQuery)
+      if (result) {
+        onLocationSelect(result)
+      }
+    } catch (error) {
+      console.error('Error searching for city:', error)
+    }
+  }
+
   return (
-    <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
-      {/* Add control elements here */}
+    <div className={`absolute top-4 right-4 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-4 rounded-lg shadow-lg`}>
+      <form onSubmit={handleSearch} className="mb-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => 
+setSearchQuery(e.target.value)}
+          placeholder="Search for a city"
+          className={`w-full p-2 border rounded ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+        />
+        <button type="submit" className={`mt-2 w-full ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white p-2 rounded`}>Search</button>
+      </form>
+      <div className="space-y-2">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={darkMode}
+            onChange={(e) => setDarkMode(e.target.checked)}
+            className="mr-2"
+          />
+          Dark Mode
+        </label>
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={showLightning}
+            onChange={(e) => setShowLightning(e.target.checked)}
+            className="mr-2"
+          />
+          Show Lightning
+        </label>
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={showAurora}
+            onChange={(e) => setShowAurora(e.target.checked)}
+            className="mr-2"
+          />
+          Show Aurora
+        </label>
+        <select
+          value={mapType}
+          onChange={(e) => setMapType(e.target.value)}
+          className={`w-full p-2 border rounded ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+        >
+          <option value="standard">Standard</option>
+          <option value="satellite">Satellite</option>
+        </select>
+      </div>
     </div>
   )
 }

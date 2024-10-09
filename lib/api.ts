@@ -1,85 +1,46 @@
-import { getMoonPhase, getMoonPosition } from './utils'
+import axios from 'axios';
+import { getMoonPhase, getMoonPosition } from './utils';
 
-interface LightningData {
-  lat: number
-  lon: number
-  intensity: number
+const OPENWEATHERMAP_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHERMAP_API_KEY;
+const AURORA_API_KEY = process.env.NEXT_PUBLIC_AURORA_API_KEY;
+
+export async function fetchLightningData() {
+  try {
+    const response = await axios.get(`https://api.openweathermap.org/data/2.5/box/city?bbox=-180,-90,180,90,10&appid=${OPENWEATHERMAP_API_KEY}`);
+    return response.data.list.filter((item: any) => item.weather[0].main === 'Thunderstorm');
+  } catch (error) {
+    console.error('Error fetching lightning data:', error);
+    return [];
+  }
 }
 
-interface AuroraData {
-  lat: number
-  lon: number
-  intensity: number
-}
-
-interface CityData {
-  name: string
-  lat: number
-  lon: number
-}
-
-const cities: Record<string, CityData> = {
-  'new york': { name: 'New York', lat: 40.7128, lon: -74.0060 },
-  'london': { name: 'London', lat: 51.5074, lon: -0.1278 },
-  'tokyo': { name: 'Tokyo', lat: 35.6762, lon: 139.6503 },
-}
-
-export async function fetchLightningData(): Promise<LightningData[]> {
-  // Simulated API call for lightning data
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { lat: 40.7128, lon: -74.0060, intensity: 0.8 },
-        { lat: 51.5074, lon: -0.1278, intensity: 0.6 },
-        { lat: 35.6762, lon: 139.6503, intensity: 0.9 },
-      ])
-    }, 1000)
-  })
-}
-
-export async function fetchAuroraData(): Promise<AuroraData[]> {
-  // Simulated API call for aurora data (both North and South poles)
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { lat: 64.2008, lon: -149.4937, intensity: 0.7 },
-        { lat: 69.6492, lon: 18.9553, intensity: 0.8 },
-        { lat: -77.8463, lon: 166.6863, intensity: 0.6 },
-        { lat: -72.0000, lon: -70.0000, intensity: 0.5 },
-      ])
-    }, 1000)
-  })
+export async function fetchAuroraData() {
+  try {
+    const response = await axios.get(`https://api.auroras.live/v1/?type=all&lat=60&long=0&api_key=${AURORA_API_KEY}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching aurora data:', error);
+    return null;
+  }
 }
 
 export async function fetchMoonData(date: Date, lat: number, lon: number) {
-  const phase = getMoonPhase(date)
-  const position = getMoonPosition(date, lat, lon)
-  return { phase, position }
+  const phase = getMoonPhase(date);
+  const position = getMoonPosition(date, lat, lon);
+  return { phase, position };
 }
 
-export async function searchCity(query: string): Promise<CityData> {
-  // Simulated API call for city search
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const result = cities[query.toLowerCase()]
-      if (result) {
-        resolve(result)
-      } else {
-        reject(new Error('City not found'))
-      }
-    }, 500)
-  })
-}
-
-export async function fetchAuroraForecast(lat: number, lon: number): Promise<number> {
-  // Simulated API call for aurora forecast
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Use lat and lon to simulate a more realistic forecast
-      const baseIntensity = Math.random()
-      const latitudeEffect = Math.abs(lat) / 90 // Higher intensity near poles
-      const intensity = baseIntensity * latitudeEffect
-      resolve(intensity)
-    }, 800)
-  })
+export async function searchCity(query: string) {
+  try {
+    const response = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`);
+    const features = response.data.features;
+    if (features.length > 0) {
+      const [lon, lat] = features[0].center;
+      return { name: features[0].place_name, lat, lon };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error searching city:', error);
+    throw error;
+  }
 }
