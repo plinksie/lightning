@@ -2,11 +2,10 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import Layout from '../../components/Layout'
-import Controls from '../../components/Controls'
-import MoonPhase from '../../components/MoonPhase'
+import Controls from '../components/Controls'
+import MoonPhase from '../components/MoonPhase'
 
-const Map = dynamic(() => import('../../components/Map'), { ssr: false })
+const Map = dynamic(() => import('../components/Map'), { ssr: false })
 
 interface LocationData {
   name: string
@@ -26,12 +25,12 @@ export default function Home() {
   }
 
   return (
-    <Layout darkMode={darkMode}>
-      <div className="flex flex-col h-screen">
-        <h1 className="text-3xl font-bold text-center py-4">
+    <div className={`flex flex-col h-screen ${darkMode ? 'dark' : ''}`}>
+      <main className={`flex-grow relative ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
+        <h1 className="text-3xl font-bold text-center py-4 font-sans">
           Electrical Storms Live - Earth
         </h1>
-        <div className="flex-grow relative">
+        <div className="h-[calc(100vh-4rem)] relative">
           <Map
             isDarkMode={darkMode}
             showLightning={showLightning}
@@ -56,10 +55,11 @@ export default function Home() {
               selectedLocation={selectedLocation.name}
               lat={selectedLocation.lat}
               lon={selectedLocation.lon}
+              isDarkMode={darkMode}
             />
           )}
         </div>
-      </div>
-    </Layout>
+      </main>
+    </div>
   )
 }

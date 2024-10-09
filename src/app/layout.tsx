@@ -1,16 +1,19 @@
-import React from 'react'
+import './globals.css'
+import type { Metadata } from 'next'
 
-interface LayoutProps {
-  children: React.ReactNode
-  isDarkMode: boolean
+export const metadata: Metadata = {
+  title: 'Electrical Storms Live - Earth',
+  description: 'Real-time visualization of electrical storms and aurora activity on Earth',
 }
 
-export default function Layout({ children, isDarkMode }: LayoutProps) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark' : ''}`}>
-      <main className="bg-white dark:bg-gray-900 text-black dark:text-white">
-        {children}
-      </main>
-    </div>
+    <html lang="en">
+      <body>{children}</body>
+    </html>
   )
 }
