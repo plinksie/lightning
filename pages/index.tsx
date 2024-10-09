@@ -1,12 +1,10 @@
-'use client'
-
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import Layout from '../../components/Layout'
-import Controls from '../../components/Controls'
-import MoonPhase from '../../components/MoonPhase'
+import Layout from '../components/Layout'
+import Controls from '../components/Controls'
+import MoonPhase from '../components/MoonPhase'
 
-const Map = dynamic(() => import('../../components/Map'), { ssr: false })
+const Map = dynamic(() => import('../components/Map'), { ssr: false })
 
 interface LocationData {
   name: string
