@@ -57,22 +57,6 @@ function MapContent({ isDarkMode, showLightning, showAurora, mapType, selectedLo
   }, [showAurora])
 
   useEffect(() => {
-    if (mapType === 'satellite') {
-      map.addLayer(L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=' + process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN))
-    } else {
-      map.eachLayer((layer) => {
-        if (layer instanceof L.TileLayer) {
-          map.removeLayer(layer)
-        }
-      })
-      map.addLayer(L.tileLayer(isDarkMode 
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-      ))
-    }
-  }, [mapType, isDarkMode, map])
-
-  useEffect(() => {
     if (lightningLayerRef.current) {
       map.removeLayer(lightningLayerRef.current)
     }

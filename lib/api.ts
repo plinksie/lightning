@@ -2,7 +2,6 @@ import axios from 'axios';
 import { getMoonPhase, getMoonPosition } from './utils';
 
 const OPENWEATHERMAP_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHERMAP_API_KEY;
-const AURORA_API_KEY = process.env.NEXT_PUBLIC_AURORA_API_KEY;
 
 export async function fetchLightningData() {
   try {
@@ -15,13 +14,11 @@ export async function fetchLightningData() {
 }
 
 export async function fetchAuroraData() {
-  try {
-    const response = await axios.get(`https://api.auroras.live/v1/?type=all&lat=60&long=0&api_key=${AURORA_API_KEY}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching aurora data:', error);
-    return null;
-  }
+  // Mock data for aurora
+  return {
+    kp_index: Math.random() * 9,
+    visibility: Math.random() > 0.5 ? 'high' : 'low'
+  };
 }
 
 export async function fetchMoonData(date: Date, lat: number, lon: number) {
@@ -32,11 +29,10 @@ export async function fetchMoonData(date: Date, lat: number, lon: number) {
 
 export async function searchCity(query: string) {
   try {
-    const response = await axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`);
-    const features = response.data.features;
-    if (features.length > 0) {
-      const [lon, lat] = features[0].center;
-      return { name: features[0].place_name, lat, lon };
+    const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+    if (response.data.length > 0) {
+      const result = response.data[0];
+      return { name: result.display_name, lat: parseFloat(result.lat), lon: parseFloat(result.lon) };
     }
     return null;
   } catch (error) {
